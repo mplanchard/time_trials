@@ -30,68 +30,83 @@ global_slotted = Slotted('foo', 'bar')
 global_regular = Regular('foo', 'bar')
 
 
-def with_slots():
+def time_with_slots():
     c = Slotted(randint(0, 100), randint(0, 100))
     return c
 
 
-def no_slots():
+def time_no_slots():
     c = Regular(randint(0, 100), randint(0, 100))
     return c
 
 
-def slot_attr_access():
+def time_slot_attr_access():
     return global_slotted.foo
 
 
-def regular_attr_access():
+def time_regular_attr_access():
     return global_slotted.foo
 
 
-def slot_attr_assignment():
+def time_slot_attr_assignment():
     global_slotted.foo = randint(0, 100)
 
 
-def regular_attr_assignment():
+def time_regular_attr_assignment():
     global_regular.foo = randint(0, 100)
 
 
-to_test = (
-    with_slots,
-    no_slots,
-    slot_attr_access,
-    regular_attr_access,
-    slot_attr_assignment,
-    regular_attr_assignment
-)
+def time_slot_attr_lookup():
+    return hasattr(global_slotted, 'foo')
+
+
+def time_regular_attr_lookup():
+    return hasattr(global_regular, 'foo')
+
+
+to_test = (v for k, v in dict(locals()).items() if k.startswith('time_'))
 
 
 for func in to_test:
     time = timeit(func, number=ITERATIONS)
-    print('{}:'.format(func.__name__))
+    print('{}:'.format(func.__name__.replace('time_', '')))
     print('> total: ', time)
     print('> average: ', time / ITERATIONS)
+    print()
 
 
 '''
 Results:
 
-with_slots:
-> total:  4.394950488000177
-> average:  4.394950488000177e-06
-no_slots:
-> total:  4.8768404389848
-> average:  4.8768404389848e-06
-slot_attr_access:
-> total:  0.14743318100227043
-> average:  1.4743318100227043e-07
-regular_attr_access:
-> total:  0.14317270601168275
-> average:  1.4317270601168275e-07
-slot_attr_assignment:
-> total:  2.0371140929928515
-> average:  2.0371140929928516e-06
 regular_attr_assignment:
-> total:  2.0186321749933995
-> average:  2.0186321749933995e-06
+> total:  2.013330613990547
+> average:  2.0133306139905473e-06
+
+slot_attr_access:
+> total:  0.14955477498006076
+> average:  1.4955477498006076e-07
+
+slot_attr_assignment:
+> total:  2.08173781100777
+> average:  2.0817378110077698e-06
+
+regular_attr_access:
+> total:  0.14511376500013284
+> average:  1.4511376500013283e-07
+
+with_slots:
+> total:  4.468222044000868
+> average:  4.468222044000868e-06
+
+no_slots:
+> total:  5.064206484996248
+> average:  5.064206484996248e-06
+
+slot_attr_lookup:
+> total:  0.22497813901281916
+> average:  2.2497813901281915e-07
+
+regular_attr_lookup:
+> total:  0.2263577709964011
+> average:  2.2635777099640107e-07
 '''
